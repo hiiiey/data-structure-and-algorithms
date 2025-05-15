@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Caesar Cipher</title>
+    <style>
+        body {
+            background-image: url('8603012228_b1d8d9167a_b.jpg'); 
+            background-size: cover;
+            background-blur: 10px;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 400px;
+            margin: 100px auto;
+            color: #fff;
+        }
+
+        input, button {
+            font-size: 16px;
+            padding: 10px;
+            margin: 5px;
+            width: 100%;
+        }
+
+        button {
+            background-color: #58cdff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #58cdff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JERICO'S Caesar Cipher</h1>
+        <label for="text">Enter Text:</label>
+        <input type="text" id="text" placeholder="Enter text...">
+        <label for="shift">Shift Amount:</label>
+        <input type="number" id="shift" placeholder="Enter shift amount...">
+        <button onclick="encrypt()">Encrypt</button>
+        <button onclick="decrypt()">Decrypt</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function encrypt() {
+            performCipher(true);
+        }
+
+        function decrypt() {
+            performCipher(false);
+        }
+
+        function performCipher(isEncrypt) {
+            var text = document.getElementById('text').value;
+            var shift = parseInt(document.getElementById('shift').value);
+            var result = "";
+
+            for (var i = 0; i < text.length; i++) {
+                var charCode = text.charCodeAt(i);
+
+                if (charCode >= 65 && charCode <= 90) {
+                    result += String.fromCharCode((charCode - 65 + (isEncrypt ? shift : 26 - shift)) % 26 + 65);
+                } else if (charCode >= 97 && charCode <= 122) {
+                    result += String.fromCharCode((charCode - 97 + (isEncrypt ? shift : 26 - shift)) % 26 + 97);
+                } else {
+                    result += text[i];
+                }
+            }
+
+            document.getElementById('result').innerHTML = result;
+        }
+    </script>
+</body>
+</html>

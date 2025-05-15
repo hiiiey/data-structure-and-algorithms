@@ -1,0 +1,560 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithm Toolbox</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #1b435d; 
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px;
+            background-color: #78bbe6; 
+            border-radius: 35px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #e2dcd5; 
+        }
+
+        .menu button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color:   #3a718c; 
+            color: #e2dcd5; 
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .menu button:hover {
+            background-color: #0056b3;
+        }
+
+        .option {
+            display: none;
+            text-align: left;
+        }
+
+        .inputField {
+            width: calc(100% - 20px);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .inputField:focus {
+            border-color: #007BFF;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .results .fraction {
+            font-weight: bold;
+            font-size: 20px;
+            color: #007BFF;
+        }
+
+        .results .egyptian-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .results .egyptian-list-item {
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .results table,
+        .knapsack-results table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results th,
+        .results td,
+        .knapsack-results th,
+        .knapsack-results td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .results th,
+        .knapsack-results th {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Algorithm Toolbox</h1>
+        <div class="menu">
+            <button onclick="showOption(1)">Egyptian Fraction</button>
+            <button onclick="showOption(2)">Huffman Coding</button>
+            <button onclick="showOption(3)">Knapsack</button>
+            <button onclick="showOption(4)">Activity Selection Problem</button> <!-- Add this button -->
+            <button id="exitButton" style="display:none;" onclick="exitProgram()">Exit</button>
+        </div>
+        <div id="option1" class="option">
+            <label for="fractionInput">Enter fractions (numerator/denominator):</label><br>
+            <input type="text" id="fractionInput" class="inputField"><br>
+            <button onclick="calculateEgyptianFractions()">Calculate</button>
+            <div class="results"></div>
+        </div>
+        <div id="option2" class="option">
+            <label for="messageInput">Enter a message:</label><br>
+            <input type="text" id="messageInput" class="inputField"><br>
+            <button onclick="calculateHuffmanCodes()">Calculate</button>
+            <div class="results"></div>
+        </div>
+        <div id="option3" class="option">
+            <label for="itemInput">Enter items (Name, Profit, Weight):</label><br>
+            <div class="knapsack-inputs">
+                <label for="itemName">Item Name:</label>
+                <input type="text" id="itemName" class="inputField">
+                <label for="itemProfit">Profit:</label>
+                <input type="text" id="itemProfit" class="inputField">
+                <label for="itemWeight">Weight:</label>
+                <input type="text" id="itemWeight" class="inputField">
+                <button onclick="addItemToKnapsack()">Add Item</button>
+            </div>
+            <label for="capacityInput">Enter knapsack capacity (KG):</label><br>
+            <input type="text" id="capacityInput" class="inputField"><br>
+            <button onclick="calculateKnapsack()">Calculate</button>
+            <div class="knapsack-results">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Profit</th>
+                            <th>Weight</th>
+                            <th>Fraction Taken</th>
+                        </tr>
+                    </thead>
+                    <tbody id="knapsackTableBody">
+                    </tbody>
+                </table>
+                <div id="knapsackTotalProfit"></div>
+            </div>
+        </div>
+        <div id="option4" class="option" style="display: none;">
+            <h2>Activity Selection Problem</h2>
+            <label for="startInput">Start Time:</label><br>
+            <input type="text" id="startInput"><br>
+            <label for="endInput">End Time:</label><br>
+            <input type="text" id="endInput"><br>
+            <button onclick="addActivity()">Add Activity</button>
+            <button onclick="calculate()">Calculate</button>
+            <div id="activityTable"></div>
+        </div>
+    </div>
+
+    <script>
+        let knapsackItems = [];
+        let activities = [];
+        let exitButtonVisible = false;
+
+        function addItemToKnapsack() {
+            let name = document.getElementById('itemName').value;
+            let profit = parseInt(document.getElementById('itemProfit').value);
+            let weight = parseInt(document.getElementById('itemWeight').value);
+
+            if (isNaN(profit) || isNaN(weight)) {
+                alert("Please enter valid profit and weight values.");
+                return;
+            }
+
+            knapsackItems.push({
+                name,
+                profit,
+                weight
+            });
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemProfit').value = '';
+            document.getElementById('itemWeight').value = '';
+
+            updateKnapsackItemList();
+        }
+
+        function updateKnapsackItemList() {
+            let itemList = document.getElementById('knapsackTableBody');
+            itemList.innerHTML = '';
+
+            for (let i = 0; i < knapsackItems.length; i++) {
+                let item = knapsackItems[i];
+                let newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.profit}</td>
+                    <td>${item.weight}</td>
+                    <td></td>
+                `;
+                itemList.appendChild(newRow);
+            }
+        }
+
+        function egyptianFraction(frac) {
+            let result = [];
+
+            while (frac.numerator !== 0) {
+                let ceilValue = Math.ceil(frac.denominator / frac.numerator);
+                result.push({
+                    numerator: 1,
+                    denominator: ceilValue
+                });
+                frac = {
+                    numerator: (frac.numerator * ceilValue) - frac.denominator,
+                    denominator: frac.denominator * ceilValue
+                };
+            }
+
+            return result;
+        }
+
+        class Node {
+            constructor(data, freq) {
+                this.data = data;
+                this.freq = freq;
+                this.left = null;
+                this.right = null;
+            }
+        }
+
+        class PriorityQueue {
+            constructor(compareFunction) {
+                this.compare = compareFunction;
+                this.queue = [];
+            }
+
+            push(element) {
+                this.queue.push(element);
+                this.queue.sort(this.compare);
+            }
+
+            pop() {
+                return this.queue.shift();
+            }
+
+            size() {
+                return this.queue.length;
+            }
+        }
+
+        function compare(l, r) {
+            return l.freq - r.freq;
+        }
+
+        function printCodes(root, code, codes) {
+            if (!root) return;
+
+            if (root.data !== '$') codes[root.data] = code;
+
+            printCodes(root.left, code + '0', codes);
+            printCodes(root.right, code + '1', codes);
+        }
+
+        function huffmanCodes(message) {
+            let freq = {};
+
+            for (let c of message) {
+                freq[c] = (freq[c] || 0) + 1;
+            }
+
+            let pq = new PriorityQueue(compare);
+
+            for (let entry in freq) {
+                pq.push(new Node(entry, freq[entry]));
+            }
+
+            while (pq.size() !== 1) {
+                let left = pq.pop();
+                let right = pq.pop();
+
+                let newNode = new Node('$', left.freq + right.freq);
+                newNode.left = left;
+                newNode.right = right;
+                pq.push(newNode);
+            }
+
+            let root = pq.pop();
+
+            let codes = {};
+            printCodes(root, '', codes);
+
+            let result = `
+                <table>
+                    <tr>
+                        <th>Character</th>
+                        <th>Frequency</th>
+                        <th>Code</th>
+                    </tr>`;
+
+            for (let pair in codes) {
+                result += `
+                    <tr>
+                        <td>${pair}</td>
+                        <td>${freq[pair]}</td>
+                        <td>${codes[pair]}</td>
+                    </tr>`;
+            }
+
+            let totalBits = Object.keys(codes).reduce((acc, pair) => {
+                return acc + freq[pair] * codes[pair].length;
+            }, 0);
+
+            result += `
+                    <tr>
+                        <td colspan="2"><strong>Total Bits:</strong></td>
+                        <td>${totalBits}</td>
+                    </tr>
+                </table>`;
+
+            document.querySelector('#option2 .results').innerHTML = result;
+        }
+
+        function calculateEgyptianFractions() {
+            let input = document.getElementById('fractionInput').value;
+            let fractions = input.split(",").map(frac => {
+                let [num, den] = frac.split("/");
+                return {
+                    numerator: parseInt(num),
+                    denominator: parseInt(den)
+                };
+            });
+
+            let count = 1;
+            let resultsDiv = document.querySelector('#option1 .results');
+            resultsDiv.innerHTML = '';
+
+            for (let frac of fractions) {
+                let egyptian = egyptianFraction(frac);
+                let result = `
+                    <div class="fraction">
+                        Fraction ${count}: ${frac.numerator}/${frac.denominator} =
+                    </div>
+                    <ul class="egyptian-list">
+                        ${egyptian.map(item => `
+                            <li class="egyptian-list-item">
+                                1/${item.denominator}
+                            </li>`).join("")}
+                    </ul>`;
+                let resultElement = document.createElement('div');
+                resultElement.innerHTML = result;
+                resultsDiv.appendChild(resultElement);
+                count++;
+            }
+        }
+
+        function calculateHuffmanCodes() {
+            let message = document.getElementById('messageInput').value;
+            huffmanCodes(message);
+        }
+
+        function knapsack(capacity) {
+            let n = knapsackItems.length;
+            let selected = new Array(n).fill(0);
+            let totalProfit = 0;
+
+            knapsackItems.sort((a, b) => b.profit - a.profit);
+
+            for (let i = 0; i < n; i++) {
+                if (knapsackItems[i].weight <= capacity) {
+                    selected[i] = 1;
+                    totalProfit += knapsackItems[i].profit;
+                    capacity -= knapsackItems[i].weight;
+                } else {
+                    selected[i] = capacity / knapsackItems[i].weight;
+                    totalProfit += selected[i] * knapsackItems[i].profit;
+                    break;
+                }
+            }
+
+            let knapsackTableBody = document.getElementById('knapsackTableBody');
+            knapsackTableBody.innerHTML = '';
+
+            for (let i = 0; i < n; i++) {
+                let item = knapsackItems[i];
+                let fractionTaken = selected[i];
+                let newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.profit}</td>
+                    <td>${item.weight}</td>
+                    <td>${fractionTaken}</td>
+                `;
+                knapsackTableBody.appendChild(newRow);
+            }
+
+            let knapsackTotalProfit = document.getElementById('knapsackTotalProfit');
+            knapsackTotalProfit.innerHTML = `Maximum Profit: ${totalProfit}`;
+        }
+
+        function calculateKnapsack() {
+            let capacity = parseInt(document.getElementById('capacityInput').value);
+            if (isNaN(capacity) || capacity <= 0) {
+                alert("Please enter a valid knapsack capacity.");
+                return;
+            }
+
+            if (knapsackItems.length === 0) {
+                alert("Please add items to the knapsack.");
+                return;
+            }
+
+            knapsack(capacity);
+        }
+
+        function addActivity() {
+            let start = parseInt(document.getElementById('startInput').value);
+            let end = parseInt(document.getElementById('endInput').value);
+
+            if (isNaN(start) || isNaN(end)) {
+                alert("Please enter valid start and end times.");
+                return;
+            }
+
+            if (start >= end) {
+                alert("End time must be greater than start time.");
+                return;
+            }
+
+            activities.push({ start, end });
+
+            document.getElementById('startInput').value = '';
+            document.getElementById('endInput').value = '';
+
+            updateActivityTable();
+        }
+
+        function updateActivityTable() {
+            let activityTable = document.getElementById('activityTable');
+            activityTable.innerHTML = `
+                <h3>Activities:</h3>
+                <table>
+                    <tr>
+                        <th>Activity</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                    </tr>
+                    ${activities.map((activity, index) => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${activity.start}</td>
+                            <td>${activity.end}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+            `;
+        }
+
+        function calculate() {
+            activities.sort((a, b) => a.end - b.end);
+
+            let selectedActivities = [0];
+            let lastSelected = 0;
+
+            for (let i = 1; i < activities.length; i++) {
+                if (activities[i].start >= activities[lastSelected].end) {
+                    selectedActivities.push(i);
+                    lastSelected = i;
+                }
+            }
+
+            let activityTable = document.getElementById('activityTable');
+            activityTable.innerHTML += `
+                <h3>Selected Activities:</h3>
+                <table>
+                    <tr>
+                        <th>Activity</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                    </tr>
+                    ${selectedActivities.map(index => `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${activities[index].start}</td>
+                            <td>${activities[index].end}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+            `;
+        }
+
+        function showOption(option) {
+            let options = document.querySelectorAll('.option');
+            options.forEach(opt => opt.style.display = 'none');
+
+            let optionToShow = document.getElementById(`option${option}`);
+            if (optionToShow) {
+                optionToShow.style.display = 'block';
+            }
+
+            if (option !== 0) {
+                let exitButton = document.getElementById('exitButton');
+                exitButton.style.display = 'block';
+                exitButtonVisible = true;
+            }
+        }
+
+        function exitProgram() {
+            let options = document.querySelectorAll('.option');
+            options.forEach(opt => opt.style.display = 'none');
+
+            let menuButtons = document.querySelectorAll('.menu button');
+            menuButtons.forEach(btn => btn.style.display = 'block');
+
+            if (exitButtonVisible) {
+                let exitButton = document.getElementById('exitButton');
+                exitButton.style.display = 'none';
+                exitButtonVisible = false;
+            }
+
+            resetAllInputs();
+        }
+
+        function resetAllInputs() {
+            document.querySelectorAll('input').forEach(input => input.value = '');
+            knapsackItems = [];
+            activities = [];
+            updateKnapsackItemList();
+            updateActivityTable();
+        }
+    </script>
+</body>
+
+</html>
