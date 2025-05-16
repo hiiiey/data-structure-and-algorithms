@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bucket Sort Simulator</title>
+</head>
+<style>
+    body{
+        font-size: 1.5rem;
+    }
+    .container{
+        margin-top: 100px;
+        margin-right: auto;
+        margin-left: auto;
+        width: 80%;
+        min-width: 360px;
+    }
+    .array-input-label{
+        display: block;
+        margin-bottom: 10px;
+    }
+    .array-input{
+        display: block;
+        height: 50px;
+        box-sizing: border-box;
+        outline: none;
+        width: 600px;
+        max-width: 100%;
+        padding-left: 10px;
+        border-radius: 5px;
+        border: 1px solid black;
+        font: inherit;
+        margin-bottom: 10px;
+    }
+    .submit-array{
+        height: 40px;
+        border-radius: 5px;
+        border: none;
+        color: white;
+        background-color: #09a0aa;
+        font: inherit;
+        width: 600px;
+        max-width: 100%;
+    }
+    .submit-array:hover{
+        background-color: #06585e;
+        transform: scale(1.02);
+    }
+    .array-input:focus{
+        border: 1px solid #09a0aa;
+        box-shadow: 0 0 5px #09a0aa;
+    }
+    .input-error{
+        color: red;
+    }
+    .array{
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+    .array-element{
+        box-sizing: border-box;
+        height: 50px;
+        padding: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    .array-element.sorted{
+        border-color: green;
+        box-shadow: 0 0 5px green;
+    }
+    .array-element.compared{
+        border-color: blue;
+        box-shadow: 0 0 5px blue;
+    }
+    .bucket-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .bucket {
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px;
+    }
+    .bucket-label {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .bucket-element {
+        border: 1px solid black;
+        border-radius: 5px;
+        margin: 5px;
+        padding: 5px;
+    }
+</style>
+<body>
+    <div class="container">
+        <h2>Bucket Sort Simulator</h2>
+        <h3>Array Input</h3>
+        <input class="array-input" id="array-input" placeholder="Enter numbers, separated by spaces...">
+        <button class="submit-array" id="submit-array">Sort</button>
+        <div class="input-error" id="input-error"></div>
+        <h3>Array Output</h3>
+        <div class="bucket-container" id="bucket-container"></div>
+        <div class="status" id="status"></div>
+    </div>
+    <script>
+        const sleep = async (ms) => {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        const parseArrayInput = (inputStr) => {
+            const tokens = inputStr.trim().split(/\s+/);
+            const array = tokens.map(elem => parseFloat(elem));
+            if(array.length !== tokens.length || array.some(elem => isNaN(elem)))
+                return null;
+            return array;
+        }
+        const insertBucketToHtml = (bucketIndex, bucketArray) => {
+            const container = document.getElementById('bucket-container');
+            const bucket = document.createElement('div');
+            bucket.classList.add('bucket');
+            bucket.innerHTML = `<div class="bucket-label">Bucket ${bucketIndex + 1}</div>`;
+            const elementsHtml = bucketArray.map(elem => `<div class="bucket-element">${elem}</div>`).join('');
+            bucket.innerHTML += elementsHtml;
+            container.appendChild(bucket);
+        }
+        const setStatus = (status) => {
+            const statusElem = document.getElementById('status');
+            statusElem.innerHTML = status === 'comparing' ? 'Comparing...' : 'Sorting...';
+            statusElem.className = status;
+        }
+        const bucketSort = async () => {
+            const array = parseArrayInput(document.getElementById('array-input').value);
+            if(!array){
+                document.getElementById('input-error').innerHTML = 'Incorrect input!';
+                return;
+            }
+            document.getElementById('input-error').innerHTML = '';
+            const n = array.length;
+            const buckets = Array.from({ length: n }, () => []);
+            const max = Math.max(...array);
+            const bucketSize = Math.ceil((max + 1) / n);
+            
+            for(let i = 0; i < n; i++) {
+                const index = Math.floor(array[i] / bucketSize);
+                buckets[index].push(array[i]);
+            }
+
+            const sortedArray = [];
+            for(const bucket of buckets) {
+                bucket.sort((a, b) => a - b);
+                sortedArray.push(...bucket);
+                insertBucketToHtml(buckets.indexOf(bucket), bucket);
+                setStatus('sorting');
+                await sleep(1000);
+            }
+
+            const arrayElements = document.getElementById('bucket-container').children;
+            for(let i = 0; i < arrayElements.length; i++) {
+                arrayElements[i].classList.add('sorted');
+                setStatus('sorting');
+                await sleep(500);
+            }
+
+            setStatus('');
+        }
+        document.getElementById('submit-array').addEventListener('click', bucketSort);
+    </script>
+</body>
+</html>
