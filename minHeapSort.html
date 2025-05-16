@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Min Heap Sort</title>
+    <style>
+      /* Add your CSS styles here */
+      .tree-node::before {
+        content: "";
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-bottom: 10px solid black;
+        transform: translateX(-50%);
+      }
+
+      .tree-node::after {
+        content: "";
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid black;
+        transform: translateX(-50%);
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .bubble {
+        width: 50px;
+        height: 50px;
+        border: 2px solid black;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 5px;
+        font-size: 20px;
+        background-color: #fff;
+      }
+      .tree {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        overflow-x: auto;
+      }
+      .tree-container {
+        display: flex;
+        margin: 20px;
+      }
+      .tree-node {
+        width: 50px;
+        height: 50px;
+        border: 2px solid black;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 5px;
+        font-size: 16px;
+        background-color: #f3f3f3;
+      }
+      .actions {
+        margin-top: 10px;
+        text-align: center;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin: 5px;
+      }
+      button:hover {
+        background-color: #ddd;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Min Heap Sort</h1>
+
+    <label for="numElements">Enter the number of elements:</label>
+    <input type="number" id="numElements" />
+    <button onclick="generateContainers()">Generate Containers</button>
+    <button onclick="generateTree()">Generate Tree</button>
+    <button onclick="minHeapSort()">Min Heap Sort</button>
+
+    <div id="container" class="container"></div>
+    <div class="actions">
+      <button onclick="showStep()">Show the last two nodes</button>
+      <button onclick="resetTree()">Reset Tree</button>
+    </div>
+    <div id="tree" class="tree"></div>
+    <div id="sortedArray"></div>
+
+    <script>
+      let steps = [];
+      let currentStep = 0;
+
+      function generateContainers() {
+        const numElements = document.getElementById("numElements").value;
+        const container = document.getElementById("container");
+        container.innerHTML = "";
+
+        for (let i = 0; i < numElements; i++) {
+          const bubble = document.createElement("div");
+          bubble.classList.add("bubble");
+          bubble.innerText = Math.floor(Math.random() * 100);
+          container.appendChild(bubble);
+        }
+      }
+
+      function generateTree() {
+        const container = document.getElementById("container");
+        const elements = container.querySelectorAll(".bubble");
+        const tree = document.getElementById("tree");
+        tree.innerHTML = "";
+
+        elements.forEach((element, index) => {
+          const treeNode = document.createElement("div");
+          treeNode.classList.add("tree-node");
+          treeNode.innerText = element.innerText;
+          tree.appendChild(treeNode);
+        });
+      }
+
+      function showStep() {
+        const tree = document.getElementById("tree");
+        const elements = tree.querySelectorAll(".tree-node");
+
+        if (currentStep >= steps.length) return;
+
+        const [i, smallest, left, right] = steps[currentStep];
+
+        elements[i].style.backgroundColor = "#007bff";
+        elements[smallest].style.backgroundColor = "#007bff";
+
+        if (left < elements.length) {
+          elements[left].style.border = "2px solid #007bff";
+        }
+
+        if (right < elements.length) {
+          elements[right].style.border = "2px solid #007bff";
+        }
+
+        setTimeout(() => {
+          elements[i].style.backgroundColor = "#f3f3f3";
+          elements[smallest].style.backgroundColor = "#f3f3f3";
+          elements[left].style.border = "2px solid black";
+          elements[right].style.border = "2px solid black";
+          currentStep++;
+          showStep();
+        }, 1000);
+      }
+
+      // Rest of your code...
+
+      function minHeapSort() {
+        const container = document.getElementById("container");
+        const elements = container.querySelectorAll(".bubble");
+        const sortedArray = document.getElementById("sortedArray");
+        sortedArray.innerHTML = "";
+
+        // Reset steps and currentStep
+        steps = [];
+        currentStep = 0;
+
+        // Convert elements to a min heap
+        function heapify(arr, n, i) {
+          let smallest = i;
+          let left = 2 * i + 1;
+          let right = 2 * i + 2;
+
+          if (left < n && arr[left].innerText < arr[smallest].innerText) {
+            smallest = left;
+          }
+
+          if (right < n && arr[right].innerText < arr[smallest].innerText) {
+            smallest = right;
+          }
+
+          if (smallest !== i) {
+            // Record the steps (indices of elements being compared and swapped)
+            steps.push([i, smallest, left, right]);
+
+            // Swap elements
+            [arr[i].innerText, arr[smallest].innerText] = [
+              arr[smallest].innerText,
+              arr[i].innerText,
+            ];
+            heapify(arr, n, smallest);
+          }
+        }
+
+        // Build heap (rearrange elements)
+        for (let i = Math.floor(elements.length / 2) - 1; i >= 0; i--) {
+          heapify(elements, elements.length, i);
+        }
+
+        // Extract elements one by one to form the sorted array
+        for (let i = elements.length - 1; i >= 0; i--) {
+          // Record the step (index of the element being moved to sortedArray)
+          steps.push([0, i]);
+
+          [elements[0].innerText, elements[i].innerText] = [
+            elements[i].innerText,
+            elements[0].innerText,
+          ];
+          heapify(elements, i, 0);
+        }
+
+        // After sorting is complete, highlight the sorted array
+        elements.forEach((element, index) => {
+          setTimeout(() => {
+            element.style.backgroundColor = "#28a745";
+            element.style.color = "#fff";
+          }, 100 * index);
+        });
+      }
+    </script>
+  </body>
+</html>
