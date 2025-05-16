@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimum Spanning Tree Algorithms</title>
+    <style>
+       body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #333;
+    background-image: url('smoke.png'); 
+    background-blur: 10px; 
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.8); 
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+label {
+    font-size: 18px;
+    margin-bottom: 10px;
+    display: block;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.9); 
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #ff6600; 
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #e64d00; 
+}
+
+canvas {
+    border: 1px solid black;
+    margin-top: 20px;
+}
+
+table {
+    margin-top: 20px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th,
+td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.9); 
+}
+
+.menu {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.menu button {
+    width: 150px;
+}
+
+.algorithm-section {
+    display: none;
+}
+
+.algorithm-section.active {
+    display: block;
+}
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: 20px;">Minimum Spanning Tree Algorithms</h1>
+
+        <div class="menu">
+            <button onclick="showAlgorithm('boruvka')">Boruvka's Algorithm</button>
+            <button onclick="showAlgorithm('prim')">Prim's Algorithm</button>
+        </div>
+
+       
+        <div id="boruvkaSection" class="algorithm-section">
+            <h2 style="text-align: center; margin-bottom: 20px;">Boruvka's Algorithm</h2>
+
+            <div class="input-group">
+                <label for="vertices_boruvka">Enter number of vertices:</label>
+                <input type="number" id="vertices_boruvka" min="2" value="5">
+
+                <label for="edges_boruvka">Enter number of edges:</label>
+                <input type="number" id="edges_boruvka" min="1" value="8">
+
+                <button onclick="generateGraph('boruvka')">Generate Graph</button>
+            </div>
+
+            <canvas id="graphCanvas_boruvka" width="800" height="600"></canvas>
+
+            <button onclick="showDetails('boruvka')">Show Details</button>
+            <div id="details_boruvka" style="display:none;">
+                <h2 style="text-align: center; margin-top: 20px;">Minimum Spanning Tree Details</h2>
+                <table id="detailsTable_boruvka">
+                    <thead>
+                        <tr>
+                            <th>From Vertex</th>
+                            <th>To Vertex</th>
+                            <th>Weight</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+       
+        <div id="primSection" class="algorithm-section">
+            <h2 style="text-align: center; margin-bottom: 20px;">Prim's Algorithm</h2>
+
+            <div class="input-group">
+                <label for="vertices_prim">Enter number of vertices:</label>
+                <input type="number" id="vertices_prim" min="2" value="5">
+
+                <label for="edges_prim">Enter number of edges:</label>
+                <input type="number" id="edges_prim" min="1" value="8">
+
+                <button onclick="generateGraph('prim')">Generate Graph</button>
+            </div>
+
+            <canvas id="graphCanvas_prim" width="800" height="600"></canvas>
+
+            <button onclick="showDetails('prim')">Show Details</button>
+            <div id="details_prim" style="display:none;">
+                <h2 style="text-align: center; margin-top: 20px;">Minimum Spanning Tree Details</h2>
+                <table id="detailsTable_prim">
+                    <thead>
+                        <tr>
+                            <th>From Vertex</th>
+                            <th>To Vertex</th>
+                            <th>Weight</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showAlgorithm(algorithm) {
+            const sections = document.querySelectorAll('.algorithm-section');
+            sections.forEach(section => section.classList.remove('active'));
+            document.getElementById(`${algorithm}Section`).classList.add('active');
+        }
+
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateRandomGraph(vertices, edges) {
+            const graph = [];
+            const connectedVertices = new Set();
+
+            for (let i = 0; i < vertices; i++) {
+                graph.push([]);
+                for (let j = 0; j < vertices; j++) {
+                    graph[i].push(0);
+                }
+            }
+
+            for (let i = 0; i < edges; i++) {
+                let startVertex = Math.floor(Math.random() * vertices);
+                let endVertex = Math.floor(Math.random() * vertices);
+
+                while (startVertex === endVertex || connectedVertices.has(`${startVertex}-${endVertex}`) || connectedVertices.has(`${endVertex}-${startVertex}`)) {
+                    startVertex = Math.floor(Math.random() * vertices);
+                    endVertex = Math.floor(Math.random() * vertices);
+                }
+
+                const weight = Math.floor(Math.random() * 10) + 1;
+                graph[startVertex][endVertex] = weight;
+                graph[endVertex][startVertex] = weight;
+
+                connectedVertices.add(`${startVertex}-${endVertex}`);
+                connectedVertices.add(`${endVertex}-${startVertex}`);
+            }
+
+            return graph;
+        }
+
+        function boruvkasAlgorithm(graph) {
+            const vertices = graph.length;
+            const parent = new Array(vertices).fill(-1);
+            const cheapest = new Array(vertices).fill(-1);
+
+            let numTrees = vertices;
+
+            while (numTrees > 1) {
+                for (let i = 0; i < vertices; i++) {
+                    cheapest[i] = -1;
+                }
+
+                for (let i = 0; i < vertices; i++) {
+                    for (let j = 0; j < vertices; j++) {
+                        if (graph[i][j] !== 0) {
+                            const setI = findSet(i, parent);
+                            const setJ = findSet(j, parent);
+
+                            if (setI !== setJ) {
+                                if (cheapest[setI] === -1 || graph[i][j] < graph[cheapest[setI]][cheapest[setI]]) {
+                                    cheapest[setI] = j;
+                                }
+
+                                if (cheapest[setJ] === -1 || graph[i][j] < graph[cheapest[setJ]][cheapest[setJ]]) {
+                                    cheapest[setJ] = i;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for (let i = 0; i < vertices; i++) {
+                    if (cheapest[i] !== -1) {
+                        const setI = findSet(i, parent);
+                        const setJ = findSet(cheapest[i], parent);
+
+                        if (setI !== setJ) {
+                            parent[setJ] = setI;
+                            numTrees--;
+                        }
+                    }
+                }
+            }
+
+            const mstDetails = [];
+
+            for (let i = 0; i < vertices; i++) {
+                const parentI = findSet(i, parent);
+
+                if (parentI === i) {
+                    continue;
+                }
+
+                mstDetails.push([parentI, i, graph[i][parentI]]);
+            }
+
+            return mstDetails;
+        }
+
+        function findSet(vertex, parent) {
+            if (parent[vertex] === -1) return vertex;
+            return findSet(parent[vertex], parent);
+        }
+
+        function drawGraph(graph, canvasId) {
+    const canvas = document.getElementById(canvasId);
+    const ctx = canvas.getContext('2d');
+    const vertices = graph.length;
+    const radius = 20;
+    const center = {
+        x: canvas.width / 2,
+        y: canvas.height / 2
+    };
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < vertices; i++) {
+        const angle = (Math.PI * 2 * i) / vertices;
+        const x = center.x + Math.cos(angle) * (canvas.width / 3);
+        const y = center.y + Math.sin(angle) * (canvas.height / 3);
+
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#FF6600'; 
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff'; 
+        ctx.font = 'bold 12px Arial';
+        ctx.fillText(i, x - 5, y + 5);
+    }
+
+    for (let i = 0; i < vertices; i++) {
+        for (let j = i; j < vertices; j++) {
+            if (graph[i][j] !== 0) {
+                const x1 = center.x + Math.cos((Math.PI * 2 * i) / vertices) * (canvas.width / 3);
+                const y1 = center.y + Math.sin((Math.PI * 2 * i) / vertices) * (canvas.height / 3);
+                const x2 = center.x + Math.cos((Math.PI * 2 * j) / vertices) * (canvas.width / 3);
+                const y2 = center.y + Math.sin((Math.PI * 2 * j) / vertices) * (canvas.height / 3);
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = '#FF6600'; 
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#000000'; 
+                ctx.font = '12px Arial';
+                ctx.fillText(graph[i][j], (x1 + x2) / 2, (y1 + y2) / 2);
+            }
+        }
+    }
+}
+
+
+        function displayDetails(details, tableId) {
+            const detailsTable = document.getElementById(tableId).querySelector('tbody');
+            detailsTable.innerHTML = '';
+            for (let i = 0; i < details.length; i++) {
+                const row = detailsTable.insertRow();
+                for (let j = 0; j < details[i].length; j++) {
+                    const cell = row.insertCell();
+                    if (j === 0) {
+                        cell.innerHTML = 'Vertex ' + details[i][j];
+                    } else if (j === 1) {
+                        cell.innerHTML = 'Vertex ' + details[i][j];
+                    } else {
+                        cell.innerHTML = 'Weight ' + details[i][j];
+                    }
+                }
+            }
+        }
+
+        function showDetails(algorithm) {
+            const detailsDiv = document.getElementById(`details_${algorithm}`);
+            detailsDiv.style.display = 'block';
+            scrollToSection(`details_${algorithm}`);
+        }
+
+        function generateGraph(algorithm) {
+            const vertices = parseInt(document.getElementById(`vertices_${algorithm}`).value);
+            const edges = parseInt(document.getElementById(`edges_${algorithm}`).value);
+            const graph = generateRandomGraph(vertices, edges);
+            const mstDetails = (algorithm === 'boruvka') ? boruvkasAlgorithm(graph) : primsAlgorithm(graph);
+            const canvasId = `graphCanvas_${algorithm}`;
+            const tableId = `detailsTable_${algorithm}`;
+            drawGraph(graph, canvasId);
+            displayDetails(mstDetails, tableId);
+            showDetails(algorithm);
+        }
+
+        function primsAlgorithm(graph) {
+            const vertices = graph.length;
+            const selected = new Array(vertices).fill(false);
+            const parent = new Array(vertices).fill(-1);
+            const key = new Array(vertices).fill(Number.MAX_SAFE_INTEGER);
+            key[0] = 0;
+
+            for (let i = 0; i < vertices; i++) {
+                const u = minKeyVertex(selected, key);
+                selected[u] = true;
+
+                for (let v = 0; v < vertices; v++) {
+                    if (graph[u][v] && !selected[v] && graph[u][v] < key[v]) {
+                        parent[v] = u;
+                        key[v] = graph[u][v];
+                    }
+                }
+            }
+
+            const mstDetails = [];
+            for (let i = 1; i < vertices; i++) {
+                mstDetails.push([parent[i], i, graph[i][parent[i]]]);
+            }
+
+            return mstDetails;
+        }
+
+        function minKeyVertex(selected, key) {
+            let min = Number.MAX_SAFE_INTEGER;
+            let minIndex = -1;
+
+            for (let v = 0; v < selected.length; v++) {
+                if (!selected[v] && key[v] < min) {
+                    min = key[v];
+                    minIndex = v;
+                }
+            }
+
+            return minIndex;
+        }
+    </script>
+</body>
+
+</html>
