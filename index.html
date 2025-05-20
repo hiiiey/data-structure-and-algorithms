@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Algorithm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="main.css" />
+    <script type="module" src="/algo.js"></script>
+    <script>
+      const $ = (s) => document.querySelector(s);
+      const setContent = (html) => ($("#content").innerHTML = html);
+    </script>
+    <style>
+      .flex {
+        display: flex;
+      }
+      .flex-col {
+        flex-direction: column;
+      }
+      .justify-center {
+        justify-content: center;
+      }
+      .items-center {
+        align-items: center;
+      }
+      .flex-auto {
+        flex: 1 1 auto;
+      }
+
+      .flex-wrap {
+        flex-wrap: wrap;
+      }
+
+      .max-w {
+        width: 90%;
+        margin: 0 auto;
+      }
+      .text-center {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="menu">
+      <h1 style="font-size: 20px">Sorting Algorithms</h1>
+      <div class="menu-item">
+        <a href="#insertion">Insertion Sort</a>
+        <a href="#merge">Merge Sort</a>
+        <a href="#quick">Quick Sort</a>
+        <a href="#comb">Comb Sort</a>
+        <a href="#shell">Shell Sort</a>
+        <a href="#selection">Selection Sort</a>
+        <a href="#radix">Radix Sort</a>
+        <a href="#bucket">Bucket Sort</a>
+        <a href="#bubble">Bubble Sort</a>
+        <a href="#min-heap">Min-heap Sort</a>
+        <a href="#max-heap">Max-heap Sort</a>
+        <a href="#tree">Tree Sort</a>
+        <a href="#tournament">Tournament Sort</a>
+      </div>
+    </div>
+    <div id="content"></div>
+  </body>
+</html>
