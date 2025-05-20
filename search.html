@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Algorithm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="main.css" />
+    <script type="module" src="/search.js"></script>
+    <script>
+      const $ = (s) => document.querySelector(s);
+      const setContent = (html) => ($("#content").innerHTML = html);
+    </script>
+    <style>
+      .flex {
+        display: flex;
+      }
+      .flex-col {
+        flex-direction: column;
+      }
+      .justify-center {
+        justify-content: center;
+      }
+      .items-center {
+        align-items: center;
+      }
+      .flex-auto {
+        flex: 1 1 auto;
+      }
+
+      .flex-wrap {
+        flex-wrap: wrap;
+      }
+      .max-w {
+        width: 90%;
+        margin: 0 auto;
+      }
+      .text-center {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="menu">
+      <h1 style="font-size: 20px">Search Algorithms</h1>
+      <div class="menu-item">
+        <a href="#linear">Linear Search</a>
+        <a href="#binary">Binary Search</a>
+        <a href="#jump">Jump Search</a>
+        <a href="#ternary">Ternary Search</a>
+        <a href="#exponential">Exponential Search</a>
+        <a href="#interpolation">Interpolation Search</a>
+      </div>
+    </div>
+    <div id="content"></div>
+  </body>
+</html>
